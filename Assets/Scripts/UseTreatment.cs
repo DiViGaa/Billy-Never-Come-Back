@@ -1,13 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UseTreatment : Interactable
 {
+    [SerializeField] private float healthChangeAmount = 20;
+    [SerializeField] private PlayerParametrs _playerParametrs;
+    private bool _dealsDamage = false;
     public override void Interact()
     {
-        gameObject.SetActive(false);
+        _playerParametrs.ChangeHealthPoints(_dealsDamage, healthChangeAmount);
+        Destroy(gameObject);
     }
-
-    
 }

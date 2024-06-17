@@ -6,23 +6,25 @@ public class PlayerAnimator : AnimatorController
     [SerializeField] private PlayerMovement _playerMovement;
     [SerializeField] private string _currentWeaponInHand;
 
-    private KeyCode space = KeyCode.Space;
-    private KeyCode mouseLeft = KeyCode.Mouse0;
+    private readonly KeyCode space = KeyCode.Space;
+    private readonly KeyCode mouseLeft = KeyCode.Mouse0;
     private void OnEnable()
     {
         PlayerAnimatorEvent.weaponInHand += WeaponAnimation;
     }
+
     private void OnDisable()
     {
         PlayerAnimatorEvent.weaponInHand -= WeaponAnimation;
     }
+
     private void Update()
     {
         UpdatePlayerMovement();
         ChangeAnimatorAxis();
         JumpAnimation();
         AttackAnimation();
-        isGrounded();
+        IsGrounded();
     }
 
     private void UpdatePlayerMovement()
@@ -38,17 +40,17 @@ public class PlayerAnimator : AnimatorController
 
     private float HorizontalSpeed()
     {
-        return _playerMovement.horizontalAxis * _playerMovement.currentMovementSpeed;
+        return _playerMovement.HorizontalAxis * _playerMovement.currentMovementSpeed;
     }
 
     private float VerticalSpeed()
     {
-        return _playerMovement.verticalAxis * _playerMovement.currentMovementSpeed;
+        return _playerMovement.VerticalAxis * _playerMovement.currentMovementSpeed;
     }
 
     private void JumpAnimation()
     {
-        if (Input.GetKeyDown(space) && _playerMovement.IsGrounded)
+        if (Input.GetKeyDown(space) && _playerMovement.isGrounded)
             animator.SetTrigger("Jump");
         
     }
@@ -64,9 +66,9 @@ public class PlayerAnimator : AnimatorController
         return (animator.GetBool("OneHandWeapon") || animator.GetBool("TwoHandWeapon"));
     }
 
-    private void isGrounded()
+    private void IsGrounded()
     {
-        animator.SetBool("IsGraunded", _playerMovement.IsGrounded);
+        animator.SetBool("IsGraunded", _playerMovement.isGrounded);
     }
 
     public void WeaponAnimation(string weaponTag)

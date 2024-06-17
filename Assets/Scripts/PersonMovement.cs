@@ -3,34 +3,32 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public abstract class PersonMovement : MonoBehaviour
 {
-    [SerializeField] public float currentMovementSpeed = 1;
-    [SerializeField] public float targetSpeed = 1;
-    [SerializeField] public float minSpeed = 1;
-    [SerializeField] public float maxSpeed = 3;
+    public float currentMovementSpeed = 1;
+    public float targetSpeed = 1;
+    public float minSpeed = 1;
+    public float maxSpeed = 3;
     [Min(-9.8f)] public Vector3 velocity;
     public CharacterController characterController;
     public float accelerationOfGravity = -9.8f;
-    public bool IsGrounded = true;
+    public bool isGrounded = true;
+    public float _deltaSpeed = 1;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
     }
 
-    public void isGrounded()
+    public void IsGrounded()
     {
-        IsGrounded = characterController.isGrounded;
+        isGrounded = characterController.isGrounded;
     }
 
-    public void changeCurrentMovementSpeed(float current, float target, float deltaSpeed)
+    public void ChangeCurrentMovementSpeed(float current, float target, float deltaSpeed)
     {
         currentMovementSpeed = Mathf.MoveTowards(current, target, deltaSpeed * Time.deltaTime);
     }
 
-    abstract public void Movement();
-
     abstract public void Fall();
 
-    abstract public void Run();
 
 }

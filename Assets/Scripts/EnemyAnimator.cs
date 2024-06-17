@@ -42,14 +42,15 @@ public class EnemyAnimator : AnimatorController
         {
             animator.SetBool("Attack", true);
         }
-        else
-        {
-            animator.SetBool("Attack", false);
-        }
     }
 
     public bool EnemyIsAttack()
     {
         return animator.GetBool("Attack");
+    }
+
+    public void TheAttackIsOver()
+    {
+        animator.SetBool("Attack", false);
     }
 }

@@ -2,11 +2,10 @@ using UnityEngine;
 
 public class EnemyMovement : PersonMovement
 {
-    [SerializeField] public float _detectionDistance = 5;
     [SerializeField] private EnemyAnimator _EnemyAnimator;
+    public float _detectionDistance = 5;
 
     private Transform _player;
-    private float _deltaSpeed = 20;
 
     public Transform startPos;
 
@@ -17,44 +16,42 @@ public class EnemyMovement : PersonMovement
     }
     private void Update()
     {
-        isGrounded();
-        Movement();
+        IsGrounded();
+        MoveToStartPos();
         Fall();
-        Run();
+        Chase();
     }
     public override void Fall()
     {
         velocity.y += accelerationOfGravity * Time.deltaTime;
     }
 
-    public override void Movement()
+    private void MoveToStartPos()
     {
         if (DistanceToPlayer() > _detectionDistance)
         {
-            transform.LookAt(startPos);
-            transform.position = StartPosition();
+            MoveToTarget(minSpeed, startPos);
         }
     }
 
-    private Vector3 StartPosition()
+    private void Chase()
     {
-        return Vector3.MoveTowards(transform.position, startPos.position, currentMovementSpeed * Time.deltaTime);
-    }
-
-    public override void Run()
-    {
-        targetSpeed = minSpeed;
-        if((DistanceToPlayer() < _detectionDistance && DistanceToPlayer() >= 1) && !_EnemyAnimator.EnemyIsAttack())
+        if (DistanceToPlayer() <= _detectionDistance && !_EnemyAnimator.EnemyIsAttack())
         {
-            targetSpeed = maxSpeed;
-            transform.LookAt(_player);
-            transform.position = Vector3.MoveTowards(transform.position, _player.position, currentMovementSpeed * Time.deltaTime);
+            MoveToTarget(maxSpeed, _player);
         }
-        changeCurrentMovementSpeed(currentMovementSpeed, targetSpeed, _deltaSpeed);
     }
 
     public float DistanceToPlayer()
     {
         return Vector3.Distance(gameObject.transform.position, _player.position);
+    }
+
+    private void MoveToTarget(float targetSpeed, Transform targetPos)
+    {
+        this.targetSpeed = targetSpeed;
+        transform.LookAt(targetPos);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos.position, currentMovementSpeed * Time.deltaTime);
+        ChangeCurrentMovementSpeed(currentMovementSpeed, targetSpeed, _deltaSpeed);
     }
 }

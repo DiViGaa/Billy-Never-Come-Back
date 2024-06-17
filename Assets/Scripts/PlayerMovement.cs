@@ -3,18 +3,23 @@ using UnityEngine;
 
 public class PlayerMovement : PersonMovement
 {
-    [SerializeField][Range(0, 100)] private float currentStamina = 100;
     [SerializeField] private float jumpStrength = 1;
-    [SerializeField] private float _deltaSpeed = 1f;
-    [SerializeField] private float _staminaDepletionRate = 20;
+    [SerializeField] private PlayerParametrs _playerParametrs;
 
-    public float horizontalAxis { get; private set; }
-    public float verticalAxis { get; private set; }
-    private float _smoothTime;
+    public float HorizontalAxis { get; private set; }
+    public float VerticalAxis { get; private set; }
+
+    private int _minimumThresholdToUseStamina = 20;
     private Vector3 _directionOfMovement;
     private float _smoothVelocity;
     private float _lastRotation;
-    private bool canRun = true;
+    private float _smoothTime;
+    
+
+    private void Start()
+    {
+        _playerParametrs = GetComponent<PlayerParametrs>();
+    }
 
     private void Update()
     {
@@ -23,23 +28,11 @@ public class PlayerMovement : PersonMovement
         Rotate();
         Fall();
         Run();
-        isGrounded();
-    }
-    public override void Movement()
-    {
-        _directionOfMovement = new Vector3(horizontalAxis, 0, verticalAxis).normalized;
-        characterController.Move(_directionOfMovement * Time.deltaTime * currentMovementSpeed);
-        characterController.Move(velocity * Time.deltaTime);
-    }
-
-    private void GetAxis()
-    {
-        horizontalAxis = Input.GetAxis("Horizontal");
-        verticalAxis = Input.GetAxis("Vertical");
+        IsGrounded();
     }
     public void Jump()
     {
-        if (IsGrounded)
+        if (isGrounded)
             velocity.y = Mathf.Sqrt(jumpStrength * -2f * accelerationOfGravity);
     }
 
@@ -48,31 +41,46 @@ public class PlayerMovement : PersonMovement
         velocity.y += accelerationOfGravity * Time.deltaTime;
     }
 
-
-    public override void Run()
+    private void Movement()
     {
-        if (Input.GetKey(KeyCode.LeftShift) && currentStamina > 0 && canRun && PlayerMoves())
+        _directionOfMovement = new Vector3(HorizontalAxis, 0, VerticalAxis).normalized;
+        characterController.Move(_directionOfMovement * Time.deltaTime * currentMovementSpeed);
+        characterController.Move(velocity * Time.deltaTime);
+    }
+
+    private void GetAxis()
+    {
+        HorizontalAxis = Input.GetAxis("Horizontal");
+        VerticalAxis = Input.GetAxis("Vertical");
+    }
+
+
+    private void Run()
+    {
+        bool increase = false;
+        bool reduce = true;
+        if (Input.GetKey(KeyCode.LeftShift) && _playerParametrs.canRun && PlayerMoves())
         {
             targetSpeed = maxSpeed;
-            currentStamina -= Time.deltaTime * _staminaDepletionRate;
+            _playerParametrs.ChangeStamina(increase);
+            if (_playerParametrs.currentStamina == _playerParametrs.minStamina)
+                _playerParametrs.SetCanRun(false);
         }
         else
         {
-            canRun = false;
             targetSpeed = minSpeed;
-            currentStamina += Time.deltaTime * _staminaDepletionRate;
-            if (currentStamina >= 20)
-            {
-                canRun = true;
-            }
+            _playerParametrs.ChangeStamina(reduce);
+            if (_playerParametrs.currentStamina >= _minimumThresholdToUseStamina)
+                _playerParametrs.SetCanRun(true);
+            
         }
-        changeCurrentMovementSpeed(currentMovementSpeed, targetSpeed, _deltaSpeed);
+        ChangeCurrentMovementSpeed(currentMovementSpeed, targetSpeed, _deltaSpeed);
     }
 
 
     private bool PlayerMoves()
     {
-        return horizontalAxis != 0 || verticalAxis != 0;
+        return HorizontalAxis != 0 || VerticalAxis != 0;
     }
 
     private void Rotate()
