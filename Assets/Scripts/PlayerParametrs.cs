@@ -7,13 +7,13 @@ public class PlayerParametrs : MonoBehaviour
     [SerializeField] public float currentStamina { get; private set;}
     [SerializeField] private float _staminaDepletionRate = 20;
 
+    private int _minimumThresholdToUseStamina = 20;
     private float maxHealthPoints = 100;
     private float maxStamina = 100;
 
     public float minStamina { get; private set; }
     public float minHealthPoints { get; private set; }
     public bool canRun { get; private set; }
-    public bool death { get; private set; }
 
     private PlayerParametrs()
     {
@@ -22,17 +22,21 @@ public class PlayerParametrs : MonoBehaviour
         minHealthPoints = 0;
         minStamina = 0;
         canRun = true;
-        death = false;
     }
 
-
-    public void ChangeStamina(bool regenregeneration)
+    public void DecreasedStamina()
     {
-        if (regenregeneration)
-            currentStamina += Time.deltaTime * _staminaDepletionRate;
-        else
-            currentStamina -= Time.deltaTime * _staminaDepletionRate;
+        currentStamina -= Time.deltaTime * _staminaDepletionRate;
+        if (currentStamina <= minStamina)
+            SetCanRun(false);
+        currentStamina = Mathf.Clamp(currentStamina, minStamina, maxStamina);
+    }
 
+    public void IncreasedStamina()
+    {
+        currentStamina += Time.deltaTime * _staminaDepletionRate;
+        if (currentStamina >= _minimumThresholdToUseStamina)
+            SetCanRun(true);
         currentStamina = Mathf.Clamp(currentStamina, minStamina, maxStamina);
     }
 
@@ -41,18 +45,16 @@ public class PlayerParametrs : MonoBehaviour
         canRun = state;
     }
 
-    public void ChangeHealthPoints(bool dealsDamage, float healthChangeAmount)
+    public void DecreasedHealthPoints(float healthChangeAmount)
     {
-        if (dealsDamage)
-            currentHealthPoints -= healthChangeAmount;
-        else
-            currentHealthPoints += healthChangeAmount;
-
-        currentStamina = Mathf.Clamp(currentHealthPoints, minHealthPoints, maxHealthPoints);
+        currentHealthPoints -= healthChangeAmount;
+        currentHealthPoints = Mathf.Clamp(currentHealthPoints, minHealthPoints, maxHealthPoints);
     }
 
-    public void SetDeath(bool state)
+    public void IncreasedHealthPoints(float healthChangeAmount)
     {
-        death = state;
+        currentHealthPoints += healthChangeAmount;
+        currentHealthPoints = Mathf.Clamp(currentHealthPoints, minHealthPoints, maxHealthPoints);
     }
+
 }

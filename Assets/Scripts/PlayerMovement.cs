@@ -9,7 +9,6 @@ public class PlayerMovement : PersonMovement
     public float HorizontalAxis { get; private set; }
     public float VerticalAxis { get; private set; }
 
-    private int _minimumThresholdToUseStamina = 20;
     private Vector3 _directionOfMovement;
     private float _smoothVelocity;
     private float _lastRotation;
@@ -57,22 +56,16 @@ public class PlayerMovement : PersonMovement
 
     private void Run()
     {
-        bool increase = false;
-        bool reduce = true;
         if (Input.GetKey(KeyCode.LeftShift) && _playerParametrs.canRun && PlayerMoves())
         {
             targetSpeed = maxSpeed;
-            _playerParametrs.ChangeStamina(increase);
-            if (_playerParametrs.currentStamina == _playerParametrs.minStamina)
-                _playerParametrs.SetCanRun(false);
+            _playerParametrs.DecreasedStamina();
+
         }
         else
         {
             targetSpeed = minSpeed;
-            _playerParametrs.ChangeStamina(reduce);
-            if (_playerParametrs.currentStamina >= _minimumThresholdToUseStamina)
-                _playerParametrs.SetCanRun(true);
-            
+            _playerParametrs.IncreasedStamina();
         }
         ChangeCurrentMovementSpeed(currentMovementSpeed, targetSpeed, _deltaSpeed);
     }

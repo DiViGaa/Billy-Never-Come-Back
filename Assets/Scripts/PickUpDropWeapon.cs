@@ -28,7 +28,6 @@ public class PickUpDropWeapon : MonoBehaviour
         currentWeapon.transform.parent = transform;
         currentWeapon.transform.localPosition = Vector3.zero;
         currentWeapon.transform.localEulerAngles = new Vector3(82.2f, 0, 14.9f);
-        currentWeapon.GetComponent<MeshCollider>().enabled = false;
         canPicUp = true;
     }
 
@@ -39,7 +38,6 @@ public class PickUpDropWeapon : MonoBehaviour
         currentWeapon.GetComponent<MeshCollider>().isTrigger = false;
         currentWeapon.GetComponent<Outline>().enabled = true;
         canPicUp = false;
-        currentWeapon.GetComponent<MeshCollider>().enabled = true;
         currentWeapon = null;
     }
 }
